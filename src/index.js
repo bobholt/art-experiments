@@ -27,6 +27,46 @@ function describePointsOnCircle(options) {
   return points;
 }
 
+function describePointsOnSquare(options) {
+  var points = [];
+  var numberOfPoints = options.numberOfPoints || 72;
+  var center = options.center || {
+    x: 0,
+    y: 0
+  };
+  var radius = options.radius || 0;
+  var distanceBetween = radius * 8 / numberOfPoints;
+  var counterX = radius;
+  var counterY = -radius;
+
+  var i = 0;
+
+  while (i < numberOfPoints) {
+    var x, y;
+
+    x = counterX;
+    y = counterY;
+
+    if (i < numberOfPoints / 4) {
+      Math.min(counterY += distanceBetween, radius);
+    } else if (i < numberOfPoints / 2) {
+      Math.max(counterX -= distanceBetween, -radius);
+    } else if (i < 3 * numberOfPoints / 4) {
+      Math.max(counterY -= distanceBetween, -radius);
+    } else {
+      Math.min(counterX += distanceBetween, radius);
+    }
+
+    points.push({
+      x: x + center.x,
+      y: y + center.y,
+    });
+
+    i++;
+  }
+  return points;
+}
+
 function cardioid(i) {
   return i * 2;
 }
@@ -40,9 +80,21 @@ function drawEnvelope(options) {
   var heightWidth = Math.min(context.canvas.width, context.canvas.height);
   var margin = 50;
   var radius = heightWidth / 2 - margin;
-
   var numberOfPoints = options.numberOfPoints;
-  var points = describePointsOnCircle({
+  var shapeFunction;
+
+  switch (options.shape) {
+    case 'circle':
+      shapeFunction = describePointsOnCircle;
+      break;
+    case 'square':
+      shapeFunction = describePointsOnSquare;
+      break;
+    default:
+      shapeFunction = describePointsOnCircle;
+  }
+
+  var points = shapeFunction({
     center: {
       x: margin + radius,
       y: margin + radius,
@@ -73,37 +125,85 @@ function drawEnvelope(options) {
 
   drawEnvelope({
     calc: function(i) { return i + 12; },
-    id: 'one',
+    id: 'circle-one',
     numberOfPoints: 36,
+    shape: 'circle',
   });
 
   drawEnvelope({
     calc: cardioid,
-    id: 'two',
+    id: 'circle-two',
     numberOfPoints: 72,
+    shape: 'circle',
   });
 
   drawEnvelope({
     calc: nephroid,
-    id: 'three',
+    id: 'circle-three',
     numberOfPoints: 108,
+    shape: 'circle',
   });
 
   drawEnvelope({
     calc: function(i) { return Math.pow(i, 2); },
-    id: 'four',
+    id: 'circle-four',
     numberOfPoints: 90,
+    shape: 'circle',
   });
 
   drawEnvelope({
     calc: function(i) { return Math.pow(i, 3); },
-    id: 'five',
+    id: 'circle-five',
     numberOfPoints: 180,
+    shape: 'circle',
   });
 
   drawEnvelope({
     calc: function(i) { return Math.pow(i, 4); },
-    id: 'six',
-    numberOfPoints: 14,
+    id: 'circle-six',
+    numberOfPoints: 18,
+    shape: 'circle',
+  });
+
+  drawEnvelope({
+    calc: function(i) { return i + 12; },
+    id: 'square-one',
+    numberOfPoints: 36,
+    shape: 'square',
+  });
+
+  drawEnvelope({
+    calc: cardioid,
+    id: 'square-two',
+    numberOfPoints: 72,
+    shape: 'square',
+  });
+
+  drawEnvelope({
+    calc: nephroid,
+    id: 'square-three',
+    numberOfPoints: 108,
+    shape: 'square',
+  });
+
+  drawEnvelope({
+    calc: function(i) { return Math.pow(i, 2); },
+    id: 'square-four',
+    numberOfPoints: 90,
+    shape: 'square',
+  });
+
+  drawEnvelope({
+    calc: function(i) { return Math.pow(i, 3); },
+    id: 'square-five',
+    numberOfPoints: 180,
+    shape: 'square',
+  });
+
+  drawEnvelope({
+    calc: function(i) { return Math.pow(i, 4); },
+    id: 'square-six',
+    numberOfPoints: 18,
+    shape: 'square',
   });
 }());
